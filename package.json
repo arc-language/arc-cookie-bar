@@ -1,0 +1,31 @@
+{
+  "name": "@arc-lang/arc-cookie-bar",
+  "version": "0.1.0",
+  "description": "GDPR-compliant cookie consent bar for Arc public pages. Granular categories, localStorage persistence, zero dependencies.",
+  "main": "src/index.js",
+  "files": ["src", "README.md", "LICENSE", "CHANGELOG.md"],
+  "keywords": ["arc", "gdpr", "cookie", "consent", "cookie-bar", "privacy", "ccpa", "cookie-consent"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arc-language/arc-web",
+    "directory": "packages/arc-cookie-bar"
+  },
+  "homepage": "https://arc-language.dev/docs/cookie-bar",
+  "bugs": {
+    "url": "https://github.com/arc-language/arc-web/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "@arc-lang/arc": ">=0.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@arc-lang/arc": { "optional": true }
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  }
+}
