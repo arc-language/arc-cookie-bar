@@ -5,184 +5,29 @@ widget CookieBar(
   expires: Int = 365,
   title: String = "We use cookies",
   description: String = "We use cookies to enhance your experience, analyse traffic, and serve personalised content. You can choose which categories to allow.",
+  policyLabel: String = "Cookie policy",
+  acceptLabel: String = "Accept all",
+  rejectLabel: String = "Reject all",
+  customizeLabel: String = "Customize",
+  saveLabel: String = "Save preferences",
   serverPersist: Bool = false
 )
-  @raw '<style>
-  .arc-cb{position:fixed;left:0;right:0;z-index:9999;font-family:var(--arc-font-sans,system-ui,sans-serif);font-size:14px;line-height:1.5;color:var(--ui-text,#111);background:var(--ui-bg,#fff);border:1px solid var(--ui-border,#e2e8f0);box-shadow:0 4px 24px rgba(0,0,0,.10);transition:transform .3s ease,opacity .3s ease;will-change:transform,opacity}
-  .arc-cb[data-pos="bottom"]{bottom:0;border-bottom:none;border-radius:var(--ui-radius,8px) var(--ui-radius,8px) 0 0}
-  .arc-cb[data-pos="top"]{top:0;border-top:none;border-radius:0 0 var(--ui-radius,8px) var(--ui-radius,8px)}
-  .arc-cb[data-pos="modal"]{top:50%;left:50%;right:auto;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 32px));border-radius:var(--ui-radius,8px);box-shadow:0 8px 40px rgba(0,0,0,.18)}
-  .arc-cb[data-pos="modal"]::before{content:'';position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:-1;transition:opacity .3s}
-  .arc-cb.arc-cb--hidden{opacity:0;pointer-events:none;visibility:hidden}
-  .arc-cb[data-pos="bottom"].arc-cb--hidden{transform:translateY(100%)}
-  .arc-cb[data-pos="top"].arc-cb--hidden{transform:translateY(-100%)}
-  .arc-cb[data-pos="modal"].arc-cb--hidden{transform:translate(-50%,-50%)}
-  .arc-cb.arc-cb--hidden::before{opacity:0;pointer-events:none}
-  .arc-cb__inner{padding:20px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
-  .arc-cb__text{flex:1 1 260px}
-  .arc-cb__title{font-weight:600;font-size:15px;margin:0 0 4px}
-  .arc-cb__desc{color:var(--ui-muted,#64748b);margin:0;font-size:13px}
-  .arc-cb__policy{color:var(--ui-accent,#0ea5e9);text-decoration:none}
-  .arc-cb__policy:hover{text-decoration:underline}
-  .arc-cb__actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-  .arc-cb__btn{padding:8px 18px;border-radius:var(--ui-radius,8px);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:opacity .15s;line-height:1}
-  .arc-cb__btn:hover{opacity:.85}
-  .arc-cb__btn--accept{background:var(--ui-accent,#0ea5e9);color:#fff}
-  .arc-cb__btn--reject{background:var(--ui-bg-2,#f1f5f9);color:var(--ui-text,#111)}
-  .arc-cb__btn--custom{background:transparent;color:var(--ui-accent,#0ea5e9);padding:8px 10px;text-decoration:underline}
-  .arc-cb__panel{display:none;padding:0 24px 20px;border-top:1px solid var(--ui-border,#e2e8f0)}
-  .arc-cb__panel.arc-cb--open{display:block}
-  .arc-cb__cats{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
-  .arc-cb__cat{display:flex;align-items:flex-start;gap:12px}
-  .arc-cb__cat-info{flex:1}
-  .arc-cb__cat-name{font-weight:500;font-size:13px;text-transform:capitalize}
-  .arc-cb__cat-desc{font-size:12px;color:var(--ui-muted,#64748b);margin:2px 0 0}
-  .arc-cb__toggle{position:relative;width:36px;height:20px;flex-shrink:0;margin-top:2px}
-  .arc-cb__toggle input{opacity:0;width:0;height:0;position:absolute}
-  .arc-cb__slider{position:absolute;inset:0;background:var(--ui-border,#cbd5e1);border-radius:20px;cursor:pointer;transition:background .2s}
-  .arc-cb__slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s}
-  .arc-cb__toggle input:checked+.arc-cb__slider{background:var(--ui-accent,#0ea5e9)}
-  .arc-cb__toggle input:checked+.arc-cb__slider::before{transform:translateX(16px)}
-  .arc-cb__toggle input:disabled+.arc-cb__slider{opacity:.5;cursor:not-allowed}
-  .arc-cb__confirm{margin-top:14px;display:flex;justify-content:flex-end}
-  @media(max-width:540px){.arc-cb__inner{padding:16px}.arc-cb__actions{width:100%}.arc-cb__btn--accept,.arc-cb__btn--reject{flex:1;text-align:center}}
-  </style>
-  <div class="arc-cb arc-cb--hidden"
-       data-pos="{position}"
-       data-cats="{categories}"
-       data-expires="{expires}"
-       data-persist="{serverPersist}"
-       role="dialog"
-       aria-modal="true"
-       aria-label="Cookie consent"
-       aria-hidden="true">
-    <div class="arc-cb__inner">
-      <div class="arc-cb__text">
-        <p class="arc-cb__title">{title}</p>
-        <p class="arc-cb__desc">{description} <a class="arc-cb__policy" href="{policyUrl}" target="_blank" rel="noopener">Cookie policy</a></p>
-      </div>
-      <div class="arc-cb__actions">
-        <button class="arc-cb__btn arc-cb__btn--accept" data-action="accept">Accept all</button>
-        <button class="arc-cb__btn arc-cb__btn--reject" data-action="reject">Reject all</button>
-        <button class="arc-cb__btn arc-cb__btn--custom" data-action="customize" aria-expanded="false">Customize</button>
-      </div>
-    </div>
-    <div class="arc-cb__panel" role="region" aria-label="Cookie preferences">
-      <ul class="arc-cb__cats"></ul>
-      <div class="arc-cb__confirm">
-        <button class="arc-cb__btn arc-cb__btn--accept" data-action="confirm">Save preferences</button>
-      </div>
-    </div>
-  </div>
-  <script>(function(){
-  if(window._arcCBInit)return;
-  window._arcCBInit=true;
+  @raw '<style>.arc-cb{position:fixed;left:0;right:0;z-index:9999;font-family:var(--arc-font-sans,system-ui,sans-serif);font-size:14px;line-height:1.5;color:var(--ui-text,#111);background:var(--ui-bg,#fff);border:1px solid var(--ui-border,#e2e8f0);box-shadow:0 4px 24px rgba(0,0,0,.10);transition:transform .3s ease,opacity .3s ease;will-change:transform,opacity}.arc-cb[data-pos="bottom"]{bottom:0;border-bottom:none;border-radius:var(--ui-radius,8px) var(--ui-radius,8px) 0 0}.arc-cb[data-pos="top"]{top:0;border-top:none;border-radius:0 0 var(--ui-radius,8px) var(--ui-radius,8px)}.arc-cb[data-pos="modal"]{top:50%;left:50%;right:auto;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 32px));border-radius:var(--ui-radius,8px);box-shadow:0 8px 40px rgba(0,0,0,.18)}.arc-cb[data-pos="modal"]::before{content:"";position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:-1;transition:opacity .3s}.arc-cb.arc-cb--hidden{opacity:0;pointer-events:none;visibility:hidden}.arc-cb[data-pos="bottom"].arc-cb--hidden{transform:translateY(100%)}.arc-cb[data-pos="top"].arc-cb--hidden{transform:translateY(-100%)}.arc-cb[data-pos="modal"].arc-cb--hidden{transform:translate(-50%,-50%)}.arc-cb.arc-cb--hidden::before{opacity:0;pointer-events:none}.arc-cb__inner{padding:20px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}.arc-cb__text{flex:1 1 260px}.arc-cb__title{font-weight:600;font-size:15px;margin:0 0 4px}.arc-cb__desc{color:var(--ui-muted,#64748b);margin:0;font-size:13px}.arc-cb__policy{color:var(--ui-accent,#0ea5e9);text-decoration:none}.arc-cb__policy:hover{text-decoration:underline}.arc-cb__actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.arc-cb__btn{padding:8px 18px;border-radius:var(--ui-radius,8px);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:opacity .15s;line-height:1}.arc-cb__btn:hover{opacity:.85}.arc-cb__btn--accept{background:var(--ui-accent,#0ea5e9);color:#fff}.arc-cb__btn--reject{background:var(--ui-bg-2,#f1f5f9);color:var(--ui-text,#111)}.arc-cb__btn--custom{background:transparent;color:var(--ui-accent,#0ea5e9);padding:8px 10px;text-decoration:underline}.arc-cb__panel{display:none;padding:0 24px 20px;border-top:1px solid var(--ui-border,#e2e8f0)}.arc-cb__panel.arc-cb--open{display:block}.arc-cb__cats{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}.arc-cb__cat{display:flex;align-items:flex-start;gap:12px}.arc-cb__cat-info{flex:1}.arc-cb__cat-name{font-weight:500;font-size:13px;text-transform:capitalize}.arc-cb__cat-desc{font-size:12px;color:var(--ui-muted,#64748b);margin:2px 0 0}.arc-cb__toggle{position:relative;width:36px;height:20px;flex-shrink:0;margin-top:2px}.arc-cb__toggle input{opacity:0;width:0;height:0;position:absolute}.arc-cb__slider{position:absolute;inset:0;background:var(--ui-border,#cbd5e1);border-radius:20px;cursor:pointer;transition:background .2s}.arc-cb__slider::before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s}.arc-cb__toggle input:checked+.arc-cb__slider{background:var(--ui-accent,#0ea5e9)}.arc-cb__toggle input:checked+.arc-cb__slider::before{transform:translateX(16px)}.arc-cb__toggle input:disabled+.arc-cb__slider{opacity:.5;cursor:not-allowed}.arc-cb__confirm{margin-top:14px;display:flex;justify-content:flex-end}@media(max-width:540px){.arc-cb__inner{padding:16px}.arc-cb__actions{width:100%}.arc-cb__btn--accept,.arc-cb__btn--reject{flex:1;text-align:center}}</style>'
 
-  var D={necessary:"Required for the site to function. Cannot be disabled.",analytics:"Help us understand how visitors use the site.",marketing:"Used to show you relevant ads and content.",preferences:"Remember your settings and personalisation choices."};
-  var bar=document.currentScript?document.currentScript.previousElementSibling:document.querySelector(".arc-cb");
-  var panel=bar.querySelector(".arc-cb__panel");
-  var catList=bar.querySelector(".arc-cb__cats");
-  var customBtn=bar.querySelector("[data-action=customize]");
-  var KEY="arc_cookie_consent";
-  var CATS=bar.dataset.cats.split(",").map(function(c){return c.trim()}).filter(Boolean);
-  var EXP=(+bar.dataset.expires||365)*864e5;
-  var PERSIST=bar.dataset.persist.toLowerCase()==="true";
+  div class="arc-cb arc-cb--hidden" data-pos="{position}" data-cats="{categories}" data-expires="{expires}" data-persist="{serverPersist}" role="dialog" aria-modal="true" aria-label="Cookie consent" aria-hidden="true"
+    div class="arc-cb__inner"
+      div class="arc-cb__text"
+        p class="arc-cb__title" "{title}"
+        p class="arc-cb__desc"
+          text "{description} "
+          a class="arc-cb__policy" href="{policyUrl}" target="_blank" rel="noopener" "{policyLabel}"
+      div class="arc-cb__actions"
+        button class="arc-cb__btn arc-cb__btn--accept" data-action="accept" "{acceptLabel}"
+        button class="arc-cb__btn arc-cb__btn--reject" data-action="reject" "{rejectLabel}"
+        button class="arc-cb__btn arc-cb__btn--custom" data-action="customize" aria-expanded="false" "{customizeLabel}"
+    div class="arc-cb__panel" role="region" aria-label="Cookie preferences"
+      ul class="arc-cb__cats"
+      div class="arc-cb__confirm"
+        button class="arc-cb__btn arc-cb__btn--accept" data-action="confirm" "{saveLabel}"
 
-  function _load(){
-    try{
-      var d=JSON.parse(localStorage.getItem(KEY)||"null");
-      return(d&&d._e&&Date.now()<d._e)?d:null;
-    }catch(e){return null}
-  }
-
-  function _save(prefs){
-    var rec={_e:Date.now()+EXP};
-    for(var i=0;i<CATS.length;i++)rec[CATS[i]]=!!prefs[CATS[i]];
-    try{localStorage.setItem(KEY,JSON.stringify(rec))}catch(e){}
-    if(PERSIST){
-      var payload={ua:navigator.userAgent.slice(0,512),ts:new Date().toISOString()};
-      for(var k in rec)if(k!=="_e")payload[k]=rec[k];
-      fetch("/arc-cookie-bar/api/consent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),keepalive:true}).catch(function(){});
-    }
-    window.dispatchEvent(new CustomEvent("arcCookieConsent",{detail:rec}));
-    _hide();
-  }
-
-  function _buildCats(prefs){
-    var html="";
-    for(var i=0;i<CATS.length;i++){
-      var cat=CATS[i];
-      var chk=prefs?prefs[cat]!==false:cat==="necessary";
-      var dis=cat==="necessary";
-      html+='<li class="arc-cb__cat"><div class="arc-cb__cat-info"><div class="arc-cb__cat-name"></div><div class="arc-cb__cat-desc"></div></div><label class="arc-cb__toggle"><input type="checkbox" name=""'+(chk?" checked":"")+(dis?" disabled":"")+'><span class="arc-cb__slider"></span></label></li>';
-    }
-    catList.innerHTML=html;
-    var items=catList.querySelectorAll("li");
-    for(var j=0;j<CATS.length;j++){
-      items[j].querySelector(".arc-cb__cat-name").textContent=CATS[j];
-      items[j].querySelector(".arc-cb__cat-desc").textContent=D[CATS[j]]||"";
-      items[j].querySelector("input").name=CATS[j];
-    }
-  }
-
-  function _show(){
-    bar.classList.remove("arc-cb--hidden");
-    bar.setAttribute("aria-hidden","false");
-    requestAnimationFrame(function(){
-      var btn=bar.querySelector(".arc-cb__btn");
-      if(btn)btn.focus();
-    });
-  }
-
-  function _hide(){
-    bar.classList.add("arc-cb--hidden");
-    bar.setAttribute("aria-hidden","true");
-    panel.classList.remove("arc-cb--open");
-    if(customBtn)customBtn.setAttribute("aria-expanded","false");
-  }
-
-  function _acceptAll(){
-    var p={};for(var i=0;i<CATS.length;i++)p[CATS[i]]=true;
-    _save(p);
-  }
-
-  function _rejectAll(){
-    var p={};for(var i=0;i<CATS.length;i++)p[CATS[i]]=CATS[i]==="necessary";
-    _save(p);
-  }
-
-  function _confirm(){
-    var p={};
-    var inputs=catList.querySelectorAll("input");
-    for(var i=0;i<inputs.length;i++)p[inputs[i].name]=inputs[i].checked;
-    _save(p);
-  }
-
-  bar.addEventListener("click",function(e){
-    var el=e.target.closest("[data-action]");
-    if(!el)return;
-    var a=el.dataset.action;
-    if(a==="accept")_acceptAll();
-    else if(a==="reject")_rejectAll();
-    else if(a==="customize"){
-      var open=panel.classList.toggle("arc-cb--open");
-      if(open)_buildCats(_load());
-      if(customBtn)customBtn.setAttribute("aria-expanded",open?"true":"false");
-    }
-    else if(a==="confirm")_confirm();
-  });
-
-  document.addEventListener("keydown",function(e){
-    if(e.key==="Escape"&&!bar.classList.contains("arc-cb--hidden"))_rejectAll();
-  },{passive:true});
-
-  window.arcCookieBar={
-    open:function(){_buildCats(_load());_show()},
-    getConsent:function(){return _load()},
-    reset:function(){try{localStorage.removeItem(KEY)}catch(e){}window._arcCBInit=false;_show()}
-  };
-
-  var stored=_load();
-  if(stored){window.dispatchEvent(new CustomEvent("arcCookieConsent",{detail:stored}))}
-  else{_show()}
-  })()</script>'
+  @raw '<script>(function(){if(window._arcCBInit)return;window._arcCBInit=true;var D={necessary:"Required for the site to function. Cannot be disabled.",analytics:"Help us understand how visitors use the site.",marketing:"Used to show you relevant ads and content.",preferences:"Remember your settings and personalisation choices."};var bar=document.querySelector(".arc-cb");if(!bar)return;var panel=bar.querySelector(".arc-cb__panel");var catList=bar.querySelector(".arc-cb__cats");var customBtn=bar.querySelector("[data-action=customize]");var KEY="arc_cookie_consent";var CATS=bar.dataset.cats.split(",").map(function(c){return c.trim();}).filter(Boolean);var EXP=(+bar.dataset.expires||365)*864e5;var PERSIST=(bar.dataset.persist||"").toLowerCase()==="true";function _load(){try{var d=JSON.parse(localStorage.getItem(KEY)||"null");return(d&&d._e&&Date.now()<d._e)?d:null;}catch(e){return null;}}function _save(prefs){var rec={_e:Date.now()+EXP};for(var i=0;i<CATS.length;i++)rec[CATS[i]]=!!prefs[CATS[i]];try{localStorage.setItem(KEY,JSON.stringify(rec));}catch(e){}if(PERSIST){var payload={ua:navigator.userAgent.slice(0,512),ts:new Date().toISOString()};for(var k in rec)if(k!=="_e")payload[k]=rec[k];fetch("/arc-cookie-bar/api/consent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),keepalive:true}).catch(function(){});}window.dispatchEvent(new CustomEvent("arcCookieConsent",{detail:rec}));_hide();}function _buildCats(prefs){var html="";for(var i=0;i<CATS.length;i++){var cat=CATS[i];var chk=prefs?prefs[cat]!==false:cat==="necessary";var dis=cat==="necessary";html+="<li class=\"arc-cb__cat\"><div class=\"arc-cb__cat-info\"><div class=\"arc-cb__cat-name\"></div><div class=\"arc-cb__cat-desc\"></div></div><label class=\"arc-cb__toggle\"><input type=\"checkbox\" name=\"\""+(chk?" checked":"")+(dis?" disabled":"")+"><span class=\"arc-cb__slider\"></span></label></li>";}catList.innerHTML=html;var items=catList.querySelectorAll("li");for(var j=0;j<CATS.length;j++){items[j].querySelector(".arc-cb__cat-name").textContent=CATS[j];items[j].querySelector(".arc-cb__cat-desc").textContent=D[CATS[j]]||"";items[j].querySelector("input").name=CATS[j];}}function _show(){bar.classList.remove("arc-cb--hidden");bar.setAttribute("aria-hidden","false");requestAnimationFrame(function(){var btn=bar.querySelector(".arc-cb__btn");if(btn)btn.focus();});}function _hide(){bar.classList.add("arc-cb--hidden");bar.setAttribute("aria-hidden","true");panel.classList.remove("arc-cb--open");if(customBtn)customBtn.setAttribute("aria-expanded","false");}function _acceptAll(){var p={};for(var i=0;i<CATS.length;i++)p[CATS[i]]=true;_save(p);}function _rejectAll(){var p={};for(var i=0;i<CATS.length;i++)p[CATS[i]]=CATS[i]==="necessary";_save(p);}function _confirm(){var p={};var inputs=catList.querySelectorAll("input");for(var i=0;i<inputs.length;i++)p[inputs[i].name]=inputs[i].checked;_save(p);}bar.addEventListener("click",function(e){var el=e.target.closest("[data-action]");if(!el)return;var a=el.dataset.action;if(a==="accept")_acceptAll();else if(a==="reject")_rejectAll();else if(a==="customize"){var open=panel.classList.toggle("arc-cb--open");if(open)_buildCats(_load());if(customBtn)customBtn.setAttribute("aria-expanded",open?"true":"false");}else if(a==="confirm")_confirm();});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!bar.classList.contains("arc-cb--hidden"))_rejectAll();},{passive:true});window.arcCookieBar={open:function(){_buildCats(_load());_show();},getConsent:function(){return _load();},reset:function(){try{localStorage.removeItem(KEY);}catch(e){}window._arcCBInit=false;_show();}};var stored=_load();if(stored){window.dispatchEvent(new CustomEvent("arcCookieConsent",{detail:stored}));}else{_show();}})();</script>'
