@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [0.1.1] - 2026-06-02
+## [0.1.2] - 2026-06-02
 
 ### Fixed
 - Widget no longer parsed by Arc's lexer due to multi-line `@raw '<style>…</style><div>…</div><script>…</script>'` string spanning lines 10–188. The whole body was a single quoted string but Arc's lexer treats `'…'` as single-line, producing `Unterminated string literal at 10:16` on every consuming page. Rewrote the widget as three single-line `@raw` blocks (style / script) with an Arc-native `div` tree for the bar markup in between.
