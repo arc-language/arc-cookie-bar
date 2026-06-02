@@ -126,7 +126,7 @@ Each consent decision POSTs to `POST /arc-cookie-bar/api/consent`. The table is 
 | `ua` | TEXT | User-agent string, max 512 chars |
 | `created_at` | TEXT | UTC timestamp |
 
-**Security:** The consent endpoint accepts anonymous POSTs. It records consent decisions only — no personal data beyond the anonymized IP. If you want to reject requests from outside your domain, add a CSRF check or restrict with an Arc middleware.
+**Security:** The endpoint enforces a same-origin check: if the browser sends an `Origin` header, the request is rejected unless `Origin` matches the `Host` header (default ports 80/443 are normalised before comparison). Direct server-to-server POSTs without an `Origin` header (curl, cron jobs) are accepted — if you need to restrict those, add an Arc middleware.
 
 ## Positions
 

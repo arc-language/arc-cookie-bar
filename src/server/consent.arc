@@ -1,4 +1,5 @@
 @route POST "/arc-cookie-bar/api/consent" -> Response
+  # DDL runs once per process; flag resets on failure so the next request retries (safe under IF NOT EXISTS)
   if !globalThis._arcCookieBarReady
     globalThis._arcCookieBarReady = true
     try
@@ -22,7 +23,12 @@
   const fwd = request.headers.get("x-forwarded-for") || ""
   const rawIp = String(fwd).split(",")[0].trim().slice(0, 45)
   const isIpv6 = rawIp.includes(":")
-  const ip6 = rawIp.indexOf("::") >= 0 ? rawIp.split("::")[0] + "::" : rawIp.split(":").slice(0, 4).join(":") + "::"
+  const ip6parts = rawIp.split("::")
+  const ip6left = ip6parts[0] ? ip6parts[0].split(":") : []
+  const ip6right = ip6parts.length > 1 && ip6parts[1] ? ip6parts[1].split(":") : []
+  const ip6pad = 8 - ip6left.length - ip6right.length
+  const ip6full = ip6left.concat(Array(ip6pad > 0 ? ip6pad : 0).fill("0")).concat(ip6right)
+  const ip6 = ip6full.slice(0, 4).join(":") + "::"
   const ip4 = rawIp.split(".").slice(0, 3).join(".") + ".0"
   const ip = rawIp ? (isIpv6 ? ip6 : ip4) : null
   const ua = (typeof body.ua === "string" ? body.ua : "").replace(/[\x00-\x1f\x7f]/g, "").slice(0, 512)

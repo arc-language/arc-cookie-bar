@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - Widget no longer parsed by Arc's lexer due to multi-line `@raw '<style>…</style><div>…</div><script>…</script>'` string spanning lines 10–188. The whole body was a single quoted string but Arc's lexer treats `'…'` as single-line, producing `Unterminated string literal at 10:16` on every consuming page. Rewrote the widget as three single-line `@raw` blocks (style / script) with an Arc-native `div` tree for the bar markup in between.
-- Server endpoint `consent.arc` no longer trips Arc's emitter ("Cannot read properties of undefined (reading 'type')"). The trigger was the `if !globalThis._arcCBTableReady` guard combined with several `??`-chained lookups on one line. Rewrote as single-statement `const` declarations using `||` instead of `??`, dropped the guard (the `CREATE TABLE IF NOT EXISTS` is idempotent so the per-call cost is negligible).
+- Server endpoint `consent.arc` no longer trips Arc's emitter ("Cannot read properties of undefined (reading 'type')"). The trigger was the `if !globalThis._arcCBTableReady` guard combined with several `??`-chained lookups on one line. Rewrote as single-statement `const` declarations using `||` instead of `??`. A `globalThis._arcCookieBarReady` flag runs DDL once per process lifetime and resets on DDL failure so the next request can retry (safe under `IF NOT EXISTS`).
 - Repository URL pointed at the monorepo (`arc-web`) before this package was split out; corrected to `arc-language/arc-cookie-bar`.
 
 ### Added
